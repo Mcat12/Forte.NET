@@ -21,6 +21,7 @@ namespace Forte.NET {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
+            // Infer the schema using GraphQL.Conventions
             var engine = new GraphQLEngine()
                 .WithQuery<Query>()
                 .BuildSchema();
@@ -28,7 +29,7 @@ namespace Forte.NET {
 
             services.AddControllers();
             services.AddSingleton(schema);
-            services.AddWebSockets(options => { });
+            services.AddWebSockets(_ => { });
             services
                 .AddGraphQL((options, provider) => {
                     var logger = provider.GetRequiredService<ILogger<Startup>>();
