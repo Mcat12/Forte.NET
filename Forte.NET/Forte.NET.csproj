@@ -5,9 +5,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" NoWarn="NU1605"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.1" NoWarn="NU1605"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3"/>
+        <PackageReference Include="GraphQL" Version="3.2.0" />
+        <PackageReference Include="GraphQL.Conventions" Version="3.0.0" />
+        <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="4.4.0" />
+        <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="4.4.0" />
+        <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="4.4.0" />
+        <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="4.4.0" />
+        <PackageReference Include="GraphQL.Server.Ui.Playground" Version="4.4.0" />
+        <PackageReference Include="GraphQL.SystemTextJson" Version="3.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" NoWarn="NU1605" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.1" NoWarn="NU1605" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 
 </Project>
