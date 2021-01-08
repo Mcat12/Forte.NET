@@ -1,4 +1,5 @@
 using GraphQL.Conventions;
+using GraphQL.Instrumentation;
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Types;
@@ -24,6 +25,7 @@ namespace Forte.NET {
             // Infer the schema using GraphQL.Conventions
             var engine = new GraphQLEngine()
                 .WithQuery<Query>()
+                .WithMiddleware<InstrumentFieldsMiddleware>()
                 .BuildSchema();
             var schema = engine.GetSchema();
 
@@ -32,6 +34,10 @@ namespace Forte.NET {
             services.AddWebSockets(_ => { });
             services
                 .AddGraphQL((options, provider) => {
+                    // This instrumentation setting is incompatible with
+                    // GraphQL.Conventions and is handled via a different method.
+                    // See https://github.com/graphql-dotnet/conventions/issues/211
+                    options.EnableMetrics = false;
                     var logger = provider.GetRequiredService<ILogger<Startup>>();
                     options.UnhandledExceptionDelegate = ctx =>
                         logger.LogError(
