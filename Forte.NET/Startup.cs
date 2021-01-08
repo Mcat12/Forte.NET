@@ -1,20 +1,23 @@
 using GraphQL.Conventions;
 using GraphQL.Server;
+using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Query = Forte.NET.Schema.Query;
 
 namespace Forte.NET {
     public class Startup {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration) {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
@@ -24,13 +27,19 @@ namespace Forte.NET {
             var schema = engine.GetSchema();
 
             services.AddControllers();
-            // services.AddSingleton(engine);
             services.AddSingleton(schema);
-            // services.AddWebSockets(options => { });
+            services.AddWebSockets(options => { });
             services
-                .AddGraphQL()
-                // .AddWebSockets()
-                // .AddGraphTypes()
+                .AddGraphQL((options, provider) => {
+                    var logger = provider.GetRequiredService<ILogger<Startup>>();
+                    options.UnhandledExceptionDelegate = ctx =>
+                        logger.LogError(
+                            "GraphQL Error: {Error}\n{Stacktrace}",
+                            ctx.OriginalException.Message,
+                            ctx.OriginalException.StackTrace
+                        );
+                })
+                .AddWebSockets()
                 .AddSystemTextJson();
         }
 
@@ -42,10 +51,9 @@ namespace Forte.NET {
 
             app.UseRouting();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-            app.UseGraphQLPlayground(new() { Path = "/playground" });
-            // app.UseWebSockets();
-            // app.UseGraphQLWebSockets<ISchema>();
-            // app.UseGraphiQLServer(new GraphiQLOptions { Path = "/graphiql" });
+            app.UseWebSockets();
+            app.UseGraphQLWebSockets<ISchema>();
+            app.UseGraphiQLServer(new GraphiQLOptions { Path = "/graphiql" });
             app.UseGraphQL<ISchema>();
         }
     }
