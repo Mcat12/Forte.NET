@@ -1,8 +1,23 @@
+using System.Collections.Generic;
+using System.Linq;
+using Forte.NET.Database;
+using GraphQL.Types;
 
 namespace Forte.NET.Schema {
-    public class Query {
-        public string Test() => "test";
+    public class Query : ObjectGraphType {
+        public Query() {
+            Field<ListGraphType<SongType>>(
+                "songs",
+                resolve: context => Songs(context.ForteDbContext())
+            );
+            Field<ListGraphType<AlbumType>>(
+                "albums",
+                resolve: context => Albums(context.ForteDbContext())
+            );
+        }
 
-        public int IntTest() => 42;
+        private static List<Song> Songs(ForteDbContext context) => context.Songs.ToList();
+
+        private static List<Album> Albums(ForteDbContext context) => context.Albums.ToList();
     }
 }
