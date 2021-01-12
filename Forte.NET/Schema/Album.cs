@@ -12,6 +12,18 @@ namespace Forte.NET.Schema {
 
         [Column("name")]
         public string Name { get; set; } = null!;
+
+        [Column("artwork_path", TypeName = "BLOB")]
+        public string? ArtworkPath { get; set; }
+
+        [Column("release_year")]
+        public int? ReleaseYear { get; set; }
+
+        [Column("time_added", TypeName = "TIMESTAMP")]
+        public DateTime TimeAdded { get; set; }
+
+        [Column("last_played", TypeName = "TIMESTAMP")]
+        public DateTime? LastPlayed { get; set; }
     }
 
     public sealed class AlbumType : ObjectGraphType<Album> {
@@ -19,10 +31,17 @@ namespace Forte.NET.Schema {
             Name = "Album";
             Field(album => album.Id);
             Field(album => album.Name);
+            Field(album => album.ReleaseYear, true);
+            Field(album => album.LastPlayed, true);
+            Field(album => album.TimeAdded);
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<SongType>>>>("songs", resolve: context => {
                 var dbContext = context.ForteDbContext();
                 var album = context.Source;
                 return dbContext.Songs.Where(song => song.AlbumId == album.Id);
+            });
+            Field<StringGraphType>("artworkUrl", resolve: context => {
+                var album = context.Source;
+                return album.ArtworkPath == null ? null : $"/files/artwork/{album.Id}/raw";
             });
         }
     }
