@@ -1,7 +1,6 @@
 using Forte.NET.Database;
 using Forte.NET.Schema;
 using GraphQL.Server;
-using GraphQL.Server.Ui.GraphiQL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.WebSockets;
@@ -50,7 +49,7 @@ namespace Forte.NET {
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseWebSockets();
             app.UseGraphQLWebSockets<ForteSchema>();
-            app.UseGraphiQLServer(new GraphiQLOptions { Path = "/graphiql" });
+            app.UseGraphiQLServer(new() { Path = "/graphiql" });
             app.UseGraphQL<ForteSchema>();
         }
     }

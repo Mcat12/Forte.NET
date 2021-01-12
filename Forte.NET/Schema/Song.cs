@@ -42,6 +42,7 @@ namespace Forte.NET.Schema {
 
     public sealed class SongType : ObjectGraphType<Song> {
         public SongType() {
+            Name = "Song";
             Field(song => song.Id);
             Field(song => song.Name);
             Field(song => song.TrackNumber);
@@ -51,7 +52,7 @@ namespace Forte.NET.Schema {
             Field(song => song.Liked);
             Field(song => song.Duration);
             Field(song => song.TimeAdded);
-            Field<AlbumType>("album", resolve: context => {
+            Field<NonNullGraphType<AlbumType>>("album", resolve: context => {
                 var dbContext = context.ForteDbContext();
                 var song = context.Source;
                 return dbContext.Albums.Find(song.AlbumId);

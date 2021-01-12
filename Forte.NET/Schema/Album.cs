@@ -16,9 +16,10 @@ namespace Forte.NET.Schema {
 
     public sealed class AlbumType : ObjectGraphType<Album> {
         public AlbumType() {
+            Name = "Album";
             Field(album => album.Id);
             Field(album => album.Name);
-            Field<ListGraphType<SongType>>("songs", resolve: context => {
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<SongType>>>>("songs", resolve: context => {
                 var dbContext = context.ForteDbContext();
                 var album = context.Source;
                 return dbContext.Songs.Where(song => song.AlbumId == album.Id);
