@@ -19,7 +19,7 @@ namespace Forte.NET.Schema {
         public int DiskNumber { get; set; }
 
         [Column("last_played", TypeName = "TIMESTAMP")]
-        public DateTime? LastPlayed { get; set; }
+        public TimeWrapper? LastPlayed { get; set; }
 
         [Column("play_count")]
         public int PlayCount { get; set; }
@@ -31,7 +31,7 @@ namespace Forte.NET.Schema {
         public int Duration { get; set; }
 
         [Column("time_added", TypeName = "TIMESTAMP")]
-        public DateTime TimeAdded { get; set; }
+        public TimeWrapper TimeAdded { get; set; }
 
         [Column("album_id", TypeName = "BLOB")]
         public Guid AlbumId { get; set; }

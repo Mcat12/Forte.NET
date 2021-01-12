@@ -6,6 +6,7 @@ using GraphQL;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Forte.NET.Database {
     public class ForteDbContext : DbContext, IUserContextBuilder {
@@ -30,6 +31,28 @@ namespace Forte.NET.Database {
                 .Entity<Album>()
                 .Property(e => e.Id)
                 .HasConversion<byte[]>();
+
+            // Convert between DateTime and TimeWrapper
+            var timeConverter = new ValueConverter<TimeWrapper, DateTime>(
+                wrapper => wrapper.GetTime(),
+                time => new TimeWrapper(time)
+            );
+            modelBuilder
+                .Entity<Song>()
+                .Property(e => e.TimeAdded)
+                .HasConversion(timeConverter);
+            modelBuilder
+                .Entity<Song>()
+                .Property(e => e.LastPlayed)
+                .HasConversion(timeConverter);
+            modelBuilder
+                .Entity<Album>()
+                .Property(e => e.TimeAdded)
+                .HasConversion(timeConverter);
+            modelBuilder
+                .Entity<Album>()
+                .Property(e => e.LastPlayed)
+                .HasConversion(timeConverter);
         }
 
         public Task<IDictionary<string, object>> BuildUserContext(HttpContext httpContext) {

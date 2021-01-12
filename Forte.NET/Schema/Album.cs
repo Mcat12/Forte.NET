@@ -20,10 +20,10 @@ namespace Forte.NET.Schema {
         public int? ReleaseYear { get; set; }
 
         [Column("time_added", TypeName = "TIMESTAMP")]
-        public DateTime TimeAdded { get; set; }
+        public TimeWrapper TimeAdded { get; set; }
 
         [Column("last_played", TypeName = "TIMESTAMP")]
-        public DateTime? LastPlayed { get; set; }
+        public TimeWrapper? LastPlayed { get; set; }
     }
 
     public sealed class AlbumType : ObjectGraphType<Album> {
