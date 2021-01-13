@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Forte.NET.Database;
 using GraphQL.Types;
 
 namespace Forte.NET.Schema {
@@ -25,6 +27,14 @@ namespace Forte.NET.Schema {
             Field(artist => artist.Name);
             Field(artist => artist.TimeAdded);
             Field(artist => artist.LastPlayed, true);
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<AlbumType>>>>(
+                "albums",
+                resolve: context => {
+                    var dbContext = context.ForteDbContext();
+                    var artist = context.Source;
+                    return dbContext.Albums.Where(album => artist.Id == album.ArtistId);
+                }
+            );
         }
     }
 }

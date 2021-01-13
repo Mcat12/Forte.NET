@@ -33,6 +33,10 @@ namespace Forte.NET.Database {
                 .Property(e => e.Id)
                 .HasConversion<byte[]>();
             modelBuilder
+                .Entity<Album>()
+                .Property(e => e.ArtistId)
+                .HasConversion<byte[]>();
+            modelBuilder
                 .Entity<Artist>()
                 .Property(e => e.Id)
                 .HasConversion<byte[]>();
