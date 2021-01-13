@@ -52,6 +52,7 @@ namespace Forte.NET.Schema {
             Field(song => song.DiskNumber);
             Field(song => song.Duration);
             Field(song => song.TimeAdded);
+            Field("streamUrl", song => $"/files/music/{song.Id}/raw");
             Field("stats", song => new UserStats($"stats:{song.Id}", song.LastPlayed),
                 type: typeof(NonNullGraphType<UserStatsType>));
             Field("songStats", song => new SongUserStats($"song_stats:{song.Id}", song.PlayCount, song.Liked),

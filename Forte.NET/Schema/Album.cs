@@ -57,10 +57,11 @@ namespace Forte.NET.Schema {
                     return dbContext.Artists.Find(album.ArtistId);
                 }
             );
-            Field<StringGraphType>("artworkUrl", resolve: context => {
-                var album = context.Source;
-                return album.ArtworkPath == null ? null : $"/files/artwork/{album.Id}/raw";
-            });
+            Field(
+                "artworkUrl",
+                album => album.ArtworkPath == null ? null : $"/files/artwork/{album.Id}/raw",
+                type: typeof(StringGraphType)
+            );
             Field<NonNullGraphType<IntGraphType>>("duration", resolve: context => {
                 var dbContext = context.ForteDbContext();
                 var album = context.Source;
