@@ -12,6 +12,7 @@ namespace Forte.NET.Database {
     public class ForteDbContext : DbContext, IUserContextBuilder {
         public DbSet<Song> Songs { get; set; } = null!;
         public DbSet<Album> Albums { get; set; } = null!;
+        public DbSet<Artist> Artists { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseSqlite("Data Source=db.sqlite");
@@ -29,6 +30,10 @@ namespace Forte.NET.Database {
                 .HasConversion<byte[]>();
             modelBuilder
                 .Entity<Album>()
+                .Property(e => e.Id)
+                .HasConversion<byte[]>();
+            modelBuilder
+                .Entity<Artist>()
                 .Property(e => e.Id)
                 .HasConversion<byte[]>();
 
@@ -51,6 +56,14 @@ namespace Forte.NET.Database {
                 .HasConversion(timeConverter);
             modelBuilder
                 .Entity<Album>()
+                .Property(e => e.LastPlayed)
+                .HasConversion(timeConverter);
+            modelBuilder
+                .Entity<Artist>()
+                .Property(e => e.TimeAdded)
+                .HasConversion(timeConverter);
+            modelBuilder
+                .Entity<Artist>()
                 .Property(e => e.LastPlayed)
                 .HasConversion(timeConverter);
         }
