@@ -1,13 +1,12 @@
-using System;
 using GraphQL.Types;
 
 namespace Forte.NET.Schema {
     public class UserStats {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public TimeWrapper? LastPlayed { get; set; }
 
-        public UserStats(Guid id, TimeWrapper? lastPlayed) {
+        public UserStats(string id, TimeWrapper? lastPlayed) {
             Id = id;
             LastPlayed = lastPlayed;
         }

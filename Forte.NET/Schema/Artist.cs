@@ -29,7 +29,7 @@ namespace Forte.NET.Schema {
             Field(artist => artist.Id);
             Field(artist => artist.Name);
             Field(artist => artist.TimeAdded);
-            Field("stats", artist => new UserStats(artist.Id, artist.LastPlayed),
+            Field("stats", artist => new UserStats($"stats:{artist.Id}", artist.LastPlayed),
                 type: typeof(NonNullGraphType<UserStatsType>));
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<AlbumType>>>>(
                 "albums",

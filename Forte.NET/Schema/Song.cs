@@ -54,7 +54,7 @@ namespace Forte.NET.Schema {
             Field(song => song.Liked);
             Field(song => song.Duration);
             Field(song => song.TimeAdded);
-            Field("stats", song => new UserStats(song.Id, song.LastPlayed),
+            Field("stats", song => new UserStats($"stats:{song.Id}", song.LastPlayed),
                 type: typeof(NonNullGraphType<UserStatsType>));
             Field<NonNullGraphType<AlbumType>>("album", resolve: context => {
                 var dbContext = context.ForteDbContext();
