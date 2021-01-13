@@ -36,7 +36,8 @@ namespace Forte.NET.Schema {
             Field(album => album.Name);
             Field(album => album.ReleaseYear, true);
             Field(album => album.TimeAdded);
-            Field("stats", album => new UserStats(album.Id, album.LastPlayed), type: typeof(UserStatsType));
+            Field("stats", album => new UserStats(album.Id, album.LastPlayed),
+                type: typeof(NonNullGraphType<UserStatsType>));
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<SongType>>>>(
                 "songs",
                 resolve: context => {
