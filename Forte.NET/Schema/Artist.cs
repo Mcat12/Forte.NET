@@ -36,7 +36,9 @@ namespace Forte.NET.Schema {
                 resolve: context => {
                     var dbContext = context.ForteDbContext();
                     var artist = context.Source;
-                    return dbContext.Albums.Where(album => artist.Id == album.ArtistId);
+                    return dbContext.Albums
+                        .Where(album => artist.Id == album.ArtistId)
+                        .OrderByDescending(album => album.ReleaseYear ?? 0);
                 }
             );
         }
