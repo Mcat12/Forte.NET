@@ -58,6 +58,13 @@ namespace Forte.NET.Schema {
                 var album = context.Source;
                 return album.ArtworkPath == null ? null : $"/files/artwork/{album.Id}/raw";
             });
+            Field<NonNullGraphType<IntGraphType>>("duration", resolve: context => {
+                var dbContext = context.ForteDbContext();
+                var album = context.Source;
+                return dbContext.Songs
+                    .Where(song => song.AlbumId == album.Id)
+                    .Sum(song => song.Duration);
+            });
         }
     }
 }
