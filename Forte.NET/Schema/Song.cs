@@ -47,11 +47,11 @@ namespace Forte.NET.Schema {
             Field(song => song.Name);
             Field(song => song.TrackNumber);
             Field(song => song.DiskNumber);
-            Field(song => song.LastPlayed, true);
             Field(song => song.PlayCount);
             Field(song => song.Liked);
             Field(song => song.Duration);
             Field(song => song.TimeAdded);
+            Field("stats", song => new UserStats(song.Id, song.LastPlayed), type: typeof(UserStatsType));
             Field<NonNullGraphType<AlbumType>>("album", resolve: context => {
                 var dbContext = context.ForteDbContext();
                 var song = context.Source;
