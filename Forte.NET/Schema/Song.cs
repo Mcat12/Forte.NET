@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Forte.NET.Database;
 using GraphQL.Types;
@@ -38,6 +39,8 @@ namespace Forte.NET.Schema {
 
         [Column("path", TypeName = "BLOB")]
         public string Path { get; set; } = null!;
+
+        public ICollection<Artist> Artists { get; set; } = null!;
     }
 
     public sealed class SongType : ObjectGraphType<Song> {
@@ -57,6 +60,14 @@ namespace Forte.NET.Schema {
                 var song = context.Source;
                 return dbContext.Albums.Find(song.AlbumId);
             });
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<ArtistType>>>>(
+                "artists",
+                resolve: context => {
+                    var dbContext = context.ForteDbContext();
+                    var song = context.Source;
+                    return dbContext.Entry(song).Collection(e => e.Artists).Query();
+                }
+            );
         }
     }
 }

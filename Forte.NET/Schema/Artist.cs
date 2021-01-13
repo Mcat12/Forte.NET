@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Forte.NET.Database;
@@ -18,6 +19,8 @@ namespace Forte.NET.Schema {
 
         [Column("last_played", TypeName = "TIMESTAMP")]
         public TimeWrapper? LastPlayed { get; set; }
+
+        public ICollection<Song> Songs { get; set; } = null!;
     }
 
     public sealed class ArtistType : ObjectGraphType<Artist> {

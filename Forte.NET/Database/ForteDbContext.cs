@@ -70,6 +70,24 @@ namespace Forte.NET.Database {
                 .Entity<Artist>()
                 .Property(e => e.LastPlayed)
                 .HasConversion(timeConverter);
+
+            // Song and Artist many-to-many relationship
+            modelBuilder
+                .Entity<Song>()
+                .HasMany(song => song.Artists)
+                .WithMany(artist => artist.Songs)
+                .UsingEntity<Dictionary<string, object>>(
+                    "SongArtist",
+                    builder => builder
+                        .HasOne<Artist>()
+                        .WithMany()
+                        .HasForeignKey("artist_id"),
+                    builder => builder
+                        .HasOne<Song>()
+                        .WithMany()
+                        .HasForeignKey("song_id")
+                )
+                .ToTable("song_artist");
         }
 
         public Task<IDictionary<string, object>> BuildUserContext(HttpContext httpContext) {
