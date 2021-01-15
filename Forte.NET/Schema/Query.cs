@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Forte.NET.Database;
 using GraphQL;
 using GraphQL.Types;
@@ -32,26 +33,71 @@ namespace Forte.NET.Schema {
 
             Connection<SongType>()
                 .Name("songs")
-                .Resolve(context => GetConnection(context, context.ForteDbContext().Songs));
+                .Argument<AutoRegisteringInputObjectGraphType<SortParams>>("sort", "")
+                .Resolve(context => GetConnection(
+                    context,
+                    context.ForteDbContext().Songs,
+                    name => song => song.Name.ToLower().Contains(name.ToLower()),
+                    song => song.Name,
+                    song => song.TimeAdded,
+                    song => song.LastPlayed
+                ));
             Connection<AlbumType>()
                 .Name("albums")
-                .Resolve(context => GetConnection(context, context.ForteDbContext().Albums));
+                .Argument<AutoRegisteringInputObjectGraphType<SortParams>>("sort", "")
+                .Resolve(context => GetConnection(
+                    context,
+                    context.ForteDbContext().Albums,
+                    name => album => album.Name.ToLower().Contains(name.ToLower()),
+                    album => album.Name,
+                    album => album.TimeAdded,
+                    album => album.LastPlayed
+                ));
             Connection<ArtistType>()
                 .Name("artists")
-                .Resolve(context => GetConnection(context, context.ForteDbContext().Artists));
+                .Argument<AutoRegisteringInputObjectGraphType<SortParams>>("sort", "")
+                .Resolve(context => GetConnection(
+                    context,
+                    context.ForteDbContext().Artists,
+                    name => artist => artist.Name.ToLower().Contains(name.ToLower()),
+                    artist => artist.Name,
+                    artist => artist.TimeAdded,
+                    artist => artist.LastPlayed
+                ));
         }
 
         private static Connection<T> GetConnection<T>(
             IResolveFieldContext context,
-            IQueryable<T> dbSet
+            IQueryable<T> dbSet,
+            Func<string, Expression<Func<T, bool>>> filterExpression,
+            Expression<Func<T, object>> orderByName,
+            Expression<Func<T, object>> orderByTimeAdded,
+            Expression<Func<T, object?>> orderByLastPlayed
         ) where T : class {
             var first = context.GetArgument("first", 25);
             var after = context.GetArgument<string?>("after");
             var offset = after == null ? 0 : int.Parse(after);
+            var sort = context.GetArgument("sort", new SortParams { SortBy = SortBy.Lexicographically });
 
-            var tableSize = dbSet.Count();
-            var hasNextPage = offset + first < tableSize;
-            var results = dbSet.Skip(offset).Take(first).ToList();
+            var baseQuery = sort.Filter != null ? dbSet.Where(filterExpression(sort.Filter)) : dbSet;
+
+            var query = sort.SortBy switch {
+                SortBy.RecentlyAdded => sort.Reverse
+                    ? baseQuery.OrderByDescending(orderByTimeAdded)
+                    : baseQuery.OrderBy(orderByTimeAdded),
+                SortBy.Lexicographically => sort.Reverse
+                    ? baseQuery.OrderByDescending(orderByName)
+                    : baseQuery.OrderBy(orderByName),
+                SortBy.RecentlyPlayed => sort.Reverse
+                    ? baseQuery.OrderByDescending(orderByLastPlayed)
+                    : baseQuery.OrderBy(orderByLastPlayed),
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(sort.SortBy),
+                    "Missing a SortBy case in GetConnection"
+                )
+            };
+
+            var results = query.Skip(offset).Take(first).ToList();
             var edges = results
                 .Zip(Enumerable.Range(1, Int32.MaxValue))
                 .Select((item) => new Edge<T> {
@@ -59,13 +105,15 @@ namespace Forte.NET.Schema {
                     Node = item.First
                 })
                 .ToList();
+            var totalCount = baseQuery.Count();
+            var hasNextPage = offset + first < totalCount;
 
             return new Connection<T> {
                 Edges = edges,
                 PageInfo = new PageInfo {
                     HasNextPage = hasNextPage
                 },
-                TotalCount = tableSize
+                TotalCount = totalCount
             };
         }
 
