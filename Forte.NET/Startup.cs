@@ -1,3 +1,4 @@
+using Forte.NET.Database;
 using GraphQL.Conventions;
 using GraphQL.Instrumentation;
 using GraphQL.Server;
@@ -31,6 +32,7 @@ namespace Forte.NET {
 
             services.AddControllers();
             services.AddSingleton(schema);
+            services.AddDbContext<ForteDbContext>();
             services.AddWebSockets(_ => { });
             services
                 .AddGraphQL((options, provider) => {
@@ -47,6 +49,7 @@ namespace Forte.NET {
                         );
                 })
                 .AddWebSockets()
+                .AddUserContextBuilder<ForteDbContext>()
                 .AddSystemTextJson();
         }
 
